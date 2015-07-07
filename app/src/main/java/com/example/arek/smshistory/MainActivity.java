@@ -23,11 +23,9 @@ public class MainActivity extends ListActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        //ArrayList<Contact> list = new ArrayList<>();
+        
         List<Contact> list = new ArrayList<>();
         String[] uris = { "content://sms/inbox", "content://sms/sent" };
-        //for(int i = 0; i < uris.length; i++) {
         for (String s : uris) {
             Uri uri = Uri.parse(s);
             Cursor c = getSMS(uri);
