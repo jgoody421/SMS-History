@@ -21,8 +21,9 @@ public class ContactAdapter extends ArrayAdapter<Contact> {
     public View getView(int position, View convertView, ViewGroup parent) {
         Contact contact = getItem(position);
 
-        if(convertView == null)
+        if(convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.contact, parent, false);
+        }
 
         TextView textView = (TextView) convertView.findViewById(R.id.textView);
         textView.setText(contact.getName());

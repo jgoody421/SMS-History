@@ -12,6 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 
 public class MessagesActivity extends ListActivity {
@@ -23,13 +24,13 @@ public class MessagesActivity extends ListActivity {
 
         String number = getIntent().getStringExtra("Number");
         PhoneNumberUtils.formatNumber(number);
-        ArrayList<SMS> Messages = new ArrayList<>();
+        List<SMS> messages = new ArrayList<>();
 
-        Messages.addAll(getReceivedSMS(number));
-        Messages.addAll(getSentSMS(number));
-        Collections.sort(Messages, new SMSComparator());
+        messages.addAll(getReceivedSMS(number));
+        messages.addAll(getSentSMS(number));
+        Collections.sort(messages, new SMSComparator());
 
-        SMSAdapter adapter = new SMSAdapter(this, Messages);
+        SMSAdapter adapter = new SMSAdapter(this, messages);
         setListAdapter(adapter);
     }
 
@@ -55,12 +56,12 @@ public class MessagesActivity extends ListActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public ArrayList<SMS> getReceivedSMS(String number) {
+    public List<SMS> getReceivedSMS(String number) {
         Uri mSmsinboxQueryUri = Uri.parse("content://sms/inbox");
         Cursor cursor1 = getContentResolver().query(mSmsinboxQueryUri, new String[]{"_id", "thread_id", "address", "person", "date", "body", "type"}, null, null, null);
         startManagingCursor(cursor1);
         String[] columns = new String[] { "address", "person", "date", "body","type" };
-        ArrayList<SMS> messages = new ArrayList<>();
+        List<SMS> messages = new ArrayList<>();
         if (cursor1.getCount() > 0) {
             while (cursor1.moveToNext()) {
                 String address = cursor1.getString(cursor1.getColumnIndex(columns[0]));

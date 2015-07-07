@@ -20,21 +20,22 @@ import java.util.List;
 
 public class MainActivity extends ListActivity {
 
+    private final String[] URIS = { "content://sms/inbox", "content://sms/sent" };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
         List<Contact> list = new ArrayList<>();
-        String[] uris = { "content://sms/inbox", "content://sms/sent" };
-        for (String s : uris) {
+        for (String s : URIS) {
             Uri uri = Uri.parse(s);
             Cursor c = getSMS(uri);
             startManagingCursor(c);
-            ArrayList<Contact> contacts = getContacts(c);
-            //for(int j = 0; j < contacts.size(); j++) {
+            List<Contact> contacts = getContacts(c);
             for (Contact contact : contacts) {
-                if (!isOnList(contact.getNumber(), list))
+                if (!isOnList(contact.getNumber(), list)) {
                     list.add(contact);
+                }
             }
         }
         ContactAdapter adapter = new ContactAdapter(this, list);
@@ -78,31 +79,29 @@ public class MainActivity extends ListActivity {
         return managedQuery(uri, projection, selection, selectionArgs, sortOrder);
     }
 
-    private ArrayList<Contact> getContacts(Cursor numbers) {
+    private List<Contact> getContacts(Cursor numbers) {
         Cursor phones = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, null);
-        ArrayList uniqueNumbers = getUniqueNumbers(numbers);
-        ArrayList<Contact> contacts = new ArrayList<>();
+        List<String> uniqueNumbers = getUniqueNumbers(numbers);
+        List<Contact> contacts = new ArrayList<>();
 
         while (phones.moveToNext()) {
             String number = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
             String name = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
             if(name == null) {
                 name = number;
-                Contact contact = new Contact(name, number);
-                contacts.add(contact);
+                contacts.add(new Contact(name, number));
             }
-            for(int i = 0; i < uniqueNumbers.size(); i++) {
-                if(PhoneNumberUtils.compare((String) uniqueNumbers.get(i), number)) {
-                    Contact contact = new Contact(name, number);
-                    contacts.add(contact);
+            for(String uniqueNumber : uniqueNumbers) {
+                if(PhoneNumberUtils.compare(uniqueNumber, number)) {
+                    contacts.add(new Contact(name, number));
                 }
             }
         }
         return contacts;
     }
 
-    public ArrayList<String> getUniqueNumbers(Cursor c) {
-        ArrayList<String> uniqueNumbers = new ArrayList<>();
+    public List<String> getUniqueNumbers(Cursor c) {
+        List<String> uniqueNumbers = new ArrayList<>();
 
         c.moveToFirst();
         String number = (c.getString(c.getColumnIndex("address")));
@@ -110,19 +109,17 @@ public class MainActivity extends ListActivity {
 
         while(c.moveToNext()) {
             number = (c.getString(c.getColumnIndex("address")));
-                if (!uniqueNumbers.contains(number)) {
-                    uniqueNumbers.add(number);
-                }
+            if (!uniqueNumbers.contains(number)) {
+                uniqueNumbers.add(number);
+            }
         }
         return uniqueNumbers;
     }
 
     private boolean isOnList(String number, List<Contact> list) {
-        for(int i = 0; i < list.size(); i++) {
-            if(list.get(i).getNumber().equals(number))
+        for(Contact contact : list) {
+            if(contact.getNumber().equals(number))
                 return true;
-            /*else if(list.get(i).getNumber().equals(name))
-                return true;*/
         }
         return false;
     }

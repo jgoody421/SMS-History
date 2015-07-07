@@ -7,14 +7,14 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Arek on 2015-06-30.
  */
 public class SMSAdapter extends ArrayAdapter<SMS> {
 
-    public SMSAdapter(Context context, ArrayList<SMS> resource) {
+    public SMSAdapter(Context context, List<SMS> resource) {
         super(context, 0, resource);
     }
 
